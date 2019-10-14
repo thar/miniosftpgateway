@@ -93,11 +93,14 @@ fi
 if [ -n "$dir" ]; then
     IFS=',' read -ra dirArgs <<< "$dir"
     for dirPath in "${dirArgs[@]}"; do
+        bucket="$dirPath"
         dirPath="/home/$user/$dirPath"
         if [ ! -d "$dirPath" ]; then
             log "Creating directory: $dirPath"
             mkdir -p "$dirPath"
             chown -R "$uid:users" "$dirPath"
+            mc mirror minio/${bucket} ${dirPath}
+            mc mirror -w --overwrite ${dirPath} minio/${bucket} &
         else
             log "Directory already exists: $dirPath"
         fi
